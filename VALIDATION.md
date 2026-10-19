@@ -1,12 +1,12 @@
-# Validation — LightSnap 0.1.2
+# Validation — LightSnap 0.2.0
 
 검증 기록: 2026-10-19
 
 ## 확인한 결과
 
 - Apple Silicon용 릴리스 빌드, Info.plist 검사, ad-hoc 서명 검증 통과
-- `./scripts/test.sh`의 371개 assertion 통과
-- 실제 사용자 macOS 세션에서 접근성 권한 기록 초기화·재연결 후 스냅 동작 확인
+- `./scripts/test.sh`의 427개 assertion 통과
+- 0.1.2의 실제 사용자 macOS 세션에서 접근성 권한 기록 초기화·재연결 후 기존 스냅 동작 확인
 
 실사용 확인은 전체 앱·디스플레이 조합에 대한 보증이 아닙니다. GUI 자동 검증은 수행하지 않았으며, CI는 빌드·회귀 검사·앱 서명 검증만 수행합니다.
 
@@ -62,3 +62,11 @@
 - 1시간 이상 사용 중 메모리 증가 추세 확인
 
 참고: [Apple task_vm_info](https://developer.apple.com/documentation/kernel/task_vm_info_data_t), [Apple 코드 서명 요구사항](https://developer.apple.com/documentation/technotes/tn3127-inside-code-signing-requirements).
+
+## 0.2.0 추가 검증
+
+모니터 이동 순서·순환·미러링 중복·비례 환산·클램핑, 좌우 크기 순환·창/방향/화면/수동 이동에 따른 초기화, 순환 비활성화, 기존 단축키 마이그레이션·충돌 보존·새 항목 해제 유지, 로그인 항목 등록·해제·승인 대기·실패를 자동 검사합니다.
+
+로그인 항목 테스트에는 가짜 서비스를 사용하여 실제 Mac의 자동 실행 설정을 변경하지 않습니다. 실제 SMAppService 승인·다음 로그인 실행과 다중 모니터 실제 창 이동, 새 설정 UI는 수동 확인이 남아 있습니다. 새로운 상시 타이머나 별도 프로세스는 추가하지 않았지만 0.2.0의 리소스 수치는 아직 실측하지 않았습니다.
+
+로그인 항목 API: [Apple SMAppService](https://developer.apple.com/documentation/servicemanagement/smappservice).

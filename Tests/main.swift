@@ -151,4 +151,72 @@ keys.isEnabled = false; keys.reset()
 check(registrar.refs.isEmpty && !keys.isEnabled, "reset preserves paused state")
 fired = nil; registrar.onKey?(0); registrar.onKey?(999)
 check(fired == nil, "invalid callback IDs ignored")
+
+// Display order, wraparound, mirrored display deduplication, and proportional transfer.
+let leftMonitor = CGRect(x: -1920,y: -100,width: 1920,height: 1080)
+let rightMonitor = CGRect(x: 0,y: 24,width: 1440,height: 850)
+check(ScreenGeometry.nextScreen(for: firstFrame,in: [rightMonitor,leftMonitor]) == leftMonitor,"display move wraps to leftmost display")
+check(ScreenGeometry.nextScreen(for: CGRect(x: -1800,y: 0,width: 800,height: 800),in: [rightMonitor,leftMonitor]) == rightMonitor,"display move uses deterministic coordinate order")
+check(ScreenGeometry.nextScreen(for: firstFrame,in: [rightMonitor]) == nil,"one display reports no destination")
+check(ScreenGeometry.nextScreen(for: firstFrame,in: [rightMonitor,rightMonitor]) == nil,"mirrored duplicate work areas are not separate destinations")
+let transferred = ScreenGeometry.transfer(Layout.right.frame(in: leftMonitor),from: leftMonitor,to: rightMonitor)
+check(Placement.matches(transferred,Layout.right.frame(in: rightMonitor)),"transfer preserves normalized right-half position and size")
+check(ScreenGeometry.transfer(leftMonitor,from: leftMonitor,to: rightMonitor) == rightMonitor,"maximized window transfers to destination work area")
+check(rightMonitor.contains(ScreenGeometry.transfer(CGRect(x: -4000,y: -500,width: 4000,height: 3000),from: leftMonitor,to: rightMonitor)),"oversized offscreen window clamped to destination")
+
+var cycle = CycleTracker<Int>()
+var cycleFrame = firstFrame
+for expected: Layout in [.left,.leftTwoThirds,.firstThird,.left] {
+    let step = cycle.proposal(key: 1,action: .left,current: cycleFrame,screen: rightMonitor,enabled: true)
+    check(step.layout == expected,"left cycle order")
+    cycleFrame = step.layout.frame(in: rightMonitor)
+    cycle.commit(key: 1,action: .left,screen: rightMonitor,actual: cycleFrame,index: step.index)
+}
+check(cycle.proposal(key: 2,action: .left,current: cycleFrame,screen: rightMonitor,enabled: true).index == 0,"switching windows resets cycle")
+check(cycle.proposal(key: 1,action: .right,current: cycleFrame,screen: rightMonitor,enabled: true).layout == .right,"switching direction starts at half")
+check(cycle.proposal(key: 1,action: .left,current: firstFrame,screen: rightMonitor,enabled: true).index == 0,"manual move resets cycle")
+check(cycle.proposal(key: 1,action: .left,current: cycleFrame,screen: leftMonitor,enabled: true).index == 0,"changed screen resets cycle")
+check(cycle.proposal(key: 1,action: .left,current: cycleFrame,screen: rightMonitor,enabled: false).layout == .left,"cycle can be disabled")
+cycle.reset()
+check(cycle.proposal(key: 1,action: .left,current: cycleFrame,screen: rightMonitor,enabled: true).index == 0,"explicit reset after failed or different action")
+for expected: Layout in [.right,.rightTwoThirds,.lastThird,.right] {
+    let step = cycle.proposal(key: 2,action: .right,current: cycleFrame,screen: rightMonitor,enabled: true)
+    check(step.layout == expected,"right cycle order")
+    cycleFrame = step.layout.frame(in: rightMonitor)
+    cycle.commit(key: 2,action: .right,screen: rightMonitor,actual: cycleFrame,index: step.index)
+}
+check(cycle.proposal(key: 2,action: .top,current: cycleFrame,screen: rightMonitor,enabled: true).layout == .top,"vertical actions stay fixed")
+
+// Legacy saved dictionaries migrate only the new action, preserving old disabled shortcuts.
+let legacyStorage = MemoryStorage()
+legacyStorage.data = try JSONEncoder().encode(["left": custom])
+let migrated = Hotkeys(storage: legacyStorage,registrar: FakeRegistrar())
+check(migrated.bindings[.left] == custom && migrated.bindings[.right] == nil,"legacy custom and disabled shortcuts preserved")
+check(migrated.bindings[.nextDisplay] == Layout.nextDisplay.defaultShortcut,"new display shortcut added to legacy settings")
+check(migrated.update(.nextDisplay,shortcut: nil) == nil,"new display shortcut can be disabled")
+let migratedAgain = Hotkeys(storage: legacyStorage,registrar: FakeRegistrar())
+check(migratedAgain.bindings[.nextDisplay] == nil,"disabled display shortcut stays disabled after restart")
+let conflictStorage = MemoryStorage()
+conflictStorage.data = try JSONEncoder().encode(["left": Layout.nextDisplay.defaultShortcut!])
+let conflictingMigration = Hotkeys(storage: conflictStorage,registrar: FakeRegistrar())
+check(conflictingMigration.bindings[.left] == Layout.nextDisplay.defaultShortcut && conflictingMigration.bindings[.nextDisplay] == nil,"migration never overrides custom shortcut conflict")
+
+final class FakeLoginItem: LoginItemService {
+    var state: LoginItemState = .disabled
+    var registrations = 0
+    var removals = 0
+    var shouldFail = false
+    func register() throws { if shouldFail { throw NSError(domain: "test",code: 1) }; registrations += 1; state = .enabled }
+    func unregister() throws { if shouldFail { throw NSError(domain: "test",code: 2) }; removals += 1; state = .disabled }
+}
+let loginService = FakeLoginItem(), loginController = LoginItemController(service: loginService)
+check(loginController.state == .disabled && loginService.registrations == 0,"login startup does not auto-register")
+check(loginController.setEnabled(true) == nil && loginController.state == .enabled,"login enable registers service")
+check(loginController.setEnabled(true) == nil && loginService.registrations == 1,"login enable is idempotent")
+check(loginController.setEnabled(false) == nil && loginController.state == .disabled,"login disable unregisters service")
+loginService.state = .approvalRequired
+check(loginController.setEnabled(true) == nil && loginService.registrations == 1 && loginController.state == .approvalRequired,"approval required remains distinct from enabled")
+check(loginController.setEnabled(false) == nil && loginService.removals == 2,"pending approval can be cancelled")
+loginService.shouldFail = true
+check(loginController.setEnabled(true) != nil && loginController.state == .disabled,"login registration error preserves OS state")
 print("PASS: \(checks) checks (geometry, display recovery, placement failures, history, hotkey registration/persistence/pause, diagnostics)")

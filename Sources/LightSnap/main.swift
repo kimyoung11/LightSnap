@@ -1,6 +1,7 @@
 import AppKit
 import Carbon
 import UniformTypeIdentifiers
+import ServiceManagement
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMenuDelegate {
     let engine = SnapEngine()
@@ -8,6 +9,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     var statusItem: NSStatusItem!
     var window: NSWindow?
     var permissionLabel: NSTextField?
+    private let loginItem = LoginItemController()
+    private var loginCheckbox: NSButton?
+    private var loginStatusLabel: NSTextField?
+    private var cycleCheckbox: NSButton?
+    private var cyclingEnabled: Bool { UserDefaults.standard.object(forKey: "cycleHorizontalSizes") as? Bool ?? true }
     var feedback: NSTextField?
     var buttons: [Layout: NSButton] = [:]
     var recording: Layout?
@@ -96,13 +102,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         let current = NSWorkspace.shared.frontmostApplication
         let targetApp = current?.processIdentifier == ProcessInfo.processInfo.processIdentifier ? previousApp : current
         let primaryTop = NSScreen.screens.first?.frame.maxY ?? 0
+        let shouldCycle = cyclingEnabled
         let screens = NSScreen.screens.map { ScreenGeometry.accessibilityFrame($0.visibleFrame, primaryTop: primaryTop) }
         if current?.processIdentifier == ProcessInfo.processInfo.processIdentifier { window?.orderOut(nil) }
         isSnapping = true
         // AX calls may block in another app. Keep them off the UI thread, with no repeat queue.
         snapQueue.async { [weak self] in
             guard let self else { return }
-            let result = autoreleasepool { self.engine.snap(action, app: targetApp, screens: screens) }
+            let result = autoreleasepool { self.engine.snap(action, app: targetApp, screens: screens, cyclingEnabled: shouldCycle) }
             DispatchQueue.main.async {
                 self.metrics.record(milliseconds: (ProcessInfo.processInfo.systemUptime-start)*1000,status: result.status)
                 self.isSnapping = false; self.statusMessage = result.message
@@ -132,6 +139,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         수신한 전역 단축키: \(receivedHotkeyCount)회
         권한 미연결 차단: \(permissionBlockedCount)회
         스냅 활성화: \(hotkeys.isEnabled)
+        좌우 크기 순환: \(cyclingEnabled)
+        자동 실행: \(loginItem.state.description)
         마지막 상태: \(statusMessage)
         """
     }
@@ -148,10 +157,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         window?.center(); window?.makeKeyAndOrderFront(nil); NSApp.activate(ignoringOtherApps: true)
     }
     func windowWillClose(_ notification: Notification) {
-        cancelRecording(); window = nil; permissionLabel = nil; feedback = nil; buttons.removeAll()
+        cancelRecording(); window = nil; permissionLabel = nil; loginCheckbox = nil; loginStatusLabel = nil; cycleCheckbox = nil; feedback = nil; buttons.removeAll()
     }
     func windowDidResignKey(_ notification: Notification) { cancelRecording() }
+    @objc func toggleLogin(_ sender: NSButton) {
+        let error = loginItem.setEnabled(sender.state == .on)
+        feedback?.stringValue = error ?? loginItem.state.description
+        refreshPreferences()
+    }
+    @objc func openLoginSettings() { SMAppService.openSystemSettingsLoginItems() }
+    @objc func toggleCycling(_ sender: NSButton) {
+        UserDefaults.standard.set(sender.state == .on,forKey: "cycleHorizontalSizes")
+        snapQueue.async { [weak self] in self?.engine.resetCycle() }
+        feedback?.stringValue = sender.state == .on ? "좌우 단축키 반복 시 ½ → ⅔ → ⅓로 순환합니다." : "좌우 단축키를 항상 절반 크기로 배치합니다."
+    }
+    private func refreshPreferences() {
+        let state = loginItem.state
+        loginCheckbox?.state = state.requested ? .on : .off
+        loginStatusLabel?.stringValue = state.description
+        cycleCheckbox?.state = cyclingEnabled ? .on : .off
+    }
     func updatePermission() {
+        refreshPreferences()
         permissionLabel?.stringValue = engine.trusted ? "● 접근성 권한 연결됨 · 창 배치 준비 완료" : "● 접근성 권한 미연결 · 현재 실행 중인 앱을 허용해 주세요"
         permissionLabel?.textColor = engine.trusted ? .systemGreen : .systemOrange
         if !hotkeys.handlerAvailable { feedback?.stringValue = "전역 단축키 처리기를 설치하지 못했습니다. 앱을 다시 실행해 주세요." }
@@ -215,8 +242,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     }
     func buildSettings() {
         let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 760, height: 840), styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
-        w.title = "LightSnap 설정 · 0.1.2"; w.minSize = NSSize(width: 660, height: 600); w.isReleasedWhenClosed = false; w.delegate = self; window = w
-        let root = NSStackView(); root.orientation = .vertical; root.alignment = .leading; root.spacing = 14; root.edgeInsets = NSEdgeInsets(top: 24, left: 28, bottom: 20, right: 28); root.translatesAutoresizingMaskIntoConstraints = false
+        w.title = "LightSnap 설정 · 0.2.0"; w.minSize = NSSize(width: 660, height: 760); w.isReleasedWhenClosed = false; w.delegate = self; window = w
+        let root = NSStackView(); root.orientation = .vertical; root.alignment = .leading; root.spacing = 10; root.edgeInsets = NSEdgeInsets(top: 24, left: 28, bottom: 20, right: 28); root.translatesAutoresizingMaskIntoConstraints = false
         w.contentView!.addSubview(root)
         NSLayoutConstraint.activate([root.leadingAnchor.constraint(equalTo: w.contentView!.leadingAnchor), root.trailingAnchor.constraint(equalTo: w.contentView!.trailingAnchor), root.topAnchor.constraint(equalTo: w.contentView!.topAnchor), root.bottomAnchor.constraint(equalTo: w.contentView!.bottomAnchor)])
         let heading = NSStackView(); heading.orientation = .horizontal; heading.spacing = 12
@@ -236,6 +263,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             let button = NSButton(title: title,target: self,action: action); button.bezelStyle = .rounded; permissionTools.addArrangedSubview(button)
         }
         root.addArrangedSubview(permissionTools)
+        let preferences = NSStackView(); preferences.orientation = .horizontal; preferences.spacing = 16
+        let login = NSButton(checkboxWithTitle: "로그인 시 자동 실행",target: self,action: #selector(toggleLogin(_:))); loginCheckbox = login; preferences.addArrangedSubview(login)
+        let cycling = NSButton(checkboxWithTitle: "좌우 반복 시 크기 순환",target: self,action: #selector(toggleCycling(_:))); cycleCheckbox = cycling; preferences.addArrangedSubview(cycling)
+        let loginSettings = NSButton(title: "로그인 항목 설정…",target: self,action: #selector(openLoginSettings)); loginSettings.bezelStyle = .rounded; preferences.addArrangedSubview(loginSettings)
+        root.addArrangedSubview(preferences)
+        let loginState = label("",size: 11); loginState.textColor = .secondaryLabelColor; loginStatusLabel = loginState; root.addArrangedSubview(loginState)
+        refreshPreferences()
         let section = NSStackView(); section.orientation = .horizontal
         section.addArrangedSubview(label("배치 & 단축키", size: 16, weight: .semibold))
         let spacer = NSView(); spacer.setContentHuggingPriority(.defaultLow, for: .horizontal); section.addArrangedSubview(spacer)
@@ -257,7 +291,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         let message = label(statusMessage, size: 12); message.textColor = .secondaryLabelColor; feedback = message; root.addArrangedSubview(message)
         message.widthAnchor.constraint(equalTo: root.widthAnchor, constant: -56).isActive = true
         let diagnostics = NSButton(title: "리소스 진단 (5초)…", target: self, action: #selector(diagnose)); diagnostics.bezelStyle = .rounded; root.addArrangedSubview(diagnostics)
-        let foot = label("기본 조합 ⌥⌘  ·  1–6: 6분할  ·  ↩: 최대화  ·  ⌫: 복원", size: 11); foot.textColor = .tertiaryLabelColor; root.addArrangedSubview(foot)
+        let foot = label("⌥⌘←/→ 반복: 크기 순환  ·  ⌃⌥⌘→: 다음 모니터  ·  ⌥⌘⌫: 복원", size: 11); foot.textColor = .tertiaryLabelColor; root.addArrangedSubview(foot)
         scroll.setContentHuggingPriority(.defaultLow, for: .vertical)
     }
     func refreshButtons() {

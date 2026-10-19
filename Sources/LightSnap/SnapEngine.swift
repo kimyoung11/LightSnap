@@ -15,14 +15,16 @@ final class SnapEngine {
     }
     // Accessed only by the serial snap queue.
     private var history = RestoreHistory<WindowKey>()
+    private var cycle = CycleTracker<WindowKey>()
+    func resetCycle() { cycle.reset() }
     var trusted: Bool { AXIsProcessTrusted() }
     func requestPermission() {
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
         _ = AXIsProcessTrustedWithOptions(options)
         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
     }
-    func snap(_ layout: Layout, app: NSRunningApplication?, screens: [CGRect]) -> SnapOutcome {
-        func fail(_ message: String) -> SnapOutcome { SnapOutcome(status: .failure, message: message) }
+    func snap(_ layout: Layout, app: NSRunningApplication?, screens: [CGRect], cyclingEnabled: Bool = true) -> SnapOutcome {
+        func fail(_ message: String) -> SnapOutcome { cycle.reset(); return SnapOutcome(status: .failure, message: message) }
         guard trusted else { return fail("접근성 권한을 먼저 허용해 주세요.") }
         guard let app, app.processIdentifier != ProcessInfo.processInfo.processIdentifier, !app.isTerminated else { return fail("배치할 앱의 창을 먼저 선택해 주세요.") }
         let axApp = AXUIElementCreateApplication(app.processIdentifier)
@@ -36,13 +38,17 @@ final class SnapEngine {
         history.prune { deadPIDs.contains($0.pid) }
         let key = WindowKey(window: window, pid: app.processIdentifier)
         let target: CGRect
-        if layout == .restore {
+        guard let screen = ScreenGeometry.screen(for: original,in: screens) else { return fail("디스플레이를 찾을 수 없습니다.") }
+        let proposal = cycle.proposal(key: key,action: layout,current: original,screen: screen,enabled: cyclingEnabled)
+        if layout == .nextDisplay {
+            guard let destination = ScreenGeometry.nextScreen(for: original,in: screens) else { return fail("이동할 다른 모니터가 없습니다.") }
+            target = ScreenGeometry.transfer(original,from: screen,to: destination)
+        } else if layout == .restore {
             guard let saved = history.frame(for: key) else { return fail("이 창에 저장된 원래 배치가 없습니다.") }
             guard let visible = ScreenGeometry.visibleRestore(saved, in: screens) else { return fail("디스플레이를 찾을 수 없습니다.") }
             target = visible
         } else {
-            guard let screen = ScreenGeometry.screen(for: original, in: screens) else { return fail("디스플레이를 찾을 수 없습니다.") }
-            target = layout.frame(in: screen)
+            target = proposal.layout.frame(in: screen)
         }
         var canMove = DarwinBoolean(false), canResize = DarwinBoolean(false)
         guard AXUIElementIsAttributeSettable(window, kAXPositionAttribute as CFString, &canMove) == .success,
@@ -59,13 +65,16 @@ final class SnapEngine {
             guard let v = AXValueCreate(.cgPoint, &point) else { return false }
             return AXUIElementSetAttributeValue(window, kAXPositionAttribute as CFString,v) == .success
         }, read: { self.frame(window) })
+        if result != .applied { cycle.reset() }
         switch result {
         case .failed: return fail("창 배치 중 일부 작업에 실패했습니다. 복원 단축키로 이전 배치를 다시 시도할 수 있습니다.")
         case .unverified: return fail("요청을 보냈지만 결과를 확인하지 못했습니다. 복원 기록은 유지합니다.")
         case .constrained: return SnapOutcome(status: .constrained, message: "앱의 최소 크기 또는 위치 제한이 적용되었습니다. 복원 기록은 유지합니다.")
         case .applied:
             if layout == .restore { history.remove(key) }
-            return SnapOutcome(status: .success, message: "\(app.localizedName ?? "앱") · \(layout.title) 완료")
+            if cyclingEnabled && (layout == .left || layout == .right) { cycle.commit(key: key,action: layout,screen: screen,actual: target,index: proposal.index) }
+            else { cycle.reset() }
+            return SnapOutcome(status: .success, message: "\(app.localizedName ?? "앱") · \(proposal.layout.title) 완료")
         }
     }
     private func value(_ element: AXUIElement, _ name: String) -> CFTypeRef? {

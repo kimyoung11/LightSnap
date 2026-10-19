@@ -5,6 +5,7 @@ enum Layout: String, CaseIterable, Codable {
     case left, right, top, bottom, topLeft, topRight, bottomLeft, bottomRight
     case firstThird, middleThird, lastThird, leftTwoThirds, rightTwoThirds
     case cell1, cell2, cell3, cell4, cell5, cell6, maximize, restore
+    case nextDisplay
 
     var title: String {
         switch self {
@@ -16,6 +17,7 @@ enum Layout: String, CaseIterable, Codable {
         case .leftTwoThirds: return "왼쪽 ⅔"; case .rightTwoThirds: return "오른쪽 ⅔"
         case .cell1: return "6분할 · 위 1"; case .cell2: return "6분할 · 위 2"; case .cell3: return "6분할 · 위 3"
         case .cell4: return "6분할 · 아래 1"; case .cell5: return "6분할 · 아래 2"; case .cell6: return "6분할 · 아래 3"
+        case .nextDisplay: return "다음 모니터로 이동"
         case .maximize: return "최대화"; case .restore: return "원래 크기로 복원"
         }
     }
@@ -31,7 +33,7 @@ enum Layout: String, CaseIterable, Codable {
         case .leftTwoThirds: r = (0,0,2/3,1); case .rightTwoThirds: r = (1/3,0,1,1)
         case .cell1: r = (0,0,1/3,0.5); case .cell2: r = (1/3,0,2/3,0.5); case .cell3: r = (2/3,0,1,0.5)
         case .cell4: r = (0,0.5,1/3,1); case .cell5: r = (1/3,0.5,2/3,1); case .cell6: r = (2/3,0.5,1,1)
-        case .maximize, .restore: r = (0,0,1,1)
+        case .maximize, .restore, .nextDisplay: r = (0,0,1,1)
         }
         let x1 = (area.minX + area.width * r.0).rounded(), x2 = (area.minX + area.width * r.2).rounded()
         let y1 = (area.minY + area.height * r.1).rounded(), y2 = (area.minY + area.height * r.3).rounded()
@@ -48,6 +50,7 @@ enum Layout: String, CaseIterable, Codable {
         case .leftTwoThirds: code = kVK_ANSI_E; case .rightTwoThirds: code = kVK_ANSI_T
         case .cell1: code = kVK_ANSI_1; case .cell2: code = kVK_ANSI_2; case .cell3: code = kVK_ANSI_3
         case .cell4: code = kVK_ANSI_4; case .cell5: code = kVK_ANSI_5; case .cell6: code = kVK_ANSI_6
+        case .nextDisplay: return Shortcut(keyCode: UInt32(kVK_RightArrow),modifiers: UInt32(cmdKey | optionKey | controlKey))
         case .maximize: code = kVK_Return; case .restore: code = kVK_Delete
         }
         return Shortcut(keyCode: UInt32(code), modifiers: UInt32(cmdKey | optionKey))

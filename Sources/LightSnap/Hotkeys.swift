@@ -47,6 +47,11 @@ final class DefaultsShortcutStorage: ShortcutStorage {
     func save(_ data: Data) { UserDefaults.standard.set(data, forKey: "shortcuts") }
 }
 
+private struct SavedShortcuts: Codable {
+    let version: Int
+    let bindings: [String: Shortcut]
+}
+
 final class Hotkeys {
     private let registrar: HotkeyRegistrar
     private let storage: ShortcutStorage
@@ -59,8 +64,13 @@ final class Hotkeys {
     var handlerAvailable: Bool { registrar.available }
     init(storage: ShortcutStorage = DefaultsShortcutStorage(), registrar: HotkeyRegistrar = CarbonHotkeyRegistrar()) {
         self.storage = storage; self.registrar = registrar
-        if let data = storage.load(), let saved = try? JSONDecoder().decode([String: Shortcut].self, from: data) {
-            for (key, shortcut) in saved { if let layout = Layout(rawValue: key), Self.valid(shortcut) { bindings[layout] = shortcut } }
+        if let data = storage.load(), let saved = try? JSONDecoder().decode(SavedShortcuts.self,from: data) {
+            for (key, shortcut) in saved.bindings { if let layout = Layout(rawValue: key), Self.valid(shortcut) { bindings[layout] = shortcut } }
+        } else if let data = storage.load(), let legacy = try? JSONDecoder().decode([String: Shortcut].self,from: data) {
+            for (key, shortcut) in legacy { if let layout = Layout(rawValue: key), Self.valid(shortcut) { bindings[layout] = shortcut } }
+            // Existing missing entries mean disabled; only add the newly introduced action.
+            if legacy[Layout.nextDisplay.rawValue] == nil, let shortcut = Layout.nextDisplay.defaultShortcut, !bindings.values.contains(shortcut) { bindings[.nextDisplay] = shortcut }
+            save()
         } else { for layout in Layout.allCases { bindings[layout] = layout.defaultShortcut } }
         registrar.onKey = { [weak self] id in
             guard let self, self.isEnabled, !self.suspended, id > 0, Int(id) <= Layout.allCases.count else { return }
@@ -111,6 +121,6 @@ final class Hotkeys {
     }
     private func save() {
         let values = Dictionary(uniqueKeysWithValues: bindings.map { ($0.key.rawValue,$0.value) })
-        if let data = try? JSONEncoder().encode(values) { storage.save(data) }
+        if let data = try? JSONEncoder().encode(SavedShortcuts(version: 2,bindings: values)) { storage.save(data) }
     }
 }
