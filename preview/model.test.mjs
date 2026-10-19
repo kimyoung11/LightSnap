@@ -1,0 +1,16 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {layouts,createState,selectWindow,setDisplays,setCycling,applyAction} from './model.mjs';
+const current=s=>s.windows.find(w=>w.id===s.active);
+test('every fixed layout stays inside its screen',()=>{for(const rect of Object.values(layouts)){const [x,y,w,h]=rect;assert.ok(x>=0&&y>=0&&w>0&&h>0&&x+w<=1+1e-9&&y+h<=1+1e-9);}});
+test('six cells tile the work area',()=>{let total=0;for(let i=1;i<=6;i++){const [,,w,h]=layouts[`cell${i}`];total+=w*h;}assert.ok(Math.abs(total-1)<1e-9);});
+test('left and right cycle independently, then wrap',()=>{for(const action of ['left','right']){let s=createState();for(const width of [.5,2/3,1/3,.5]){s=applyAction(s,action);assert.equal(current(s).rect[2],width);}}});
+test('disabling cycling keeps halves fixed',()=>{let s=setCycling(createState(),false);s=applyAction(s,'left');s=applyAction(s,'left');assert.deepEqual(current(s).rect,layouts.left);});
+test('restore retains first placement across repeated snaps and display moves',()=>{let s=createState();const original=structuredClone(current(s));s=applyAction(s,'left');s=applyAction(s,'left');s=setDisplays(s,2);s=applyAction(s,'nextDisplay');assert.equal(current(s).monitor,1);s=applyAction(s,'restore');assert.deepEqual(current(s).rect,original.rect);assert.equal(current(s).monitor,original.monitor);assert.equal(current(s).original,null);});
+test('window histories are independent',()=>{let s=createState();const code=[...current(s).rect];s=applyAction(s,'left');s=selectWindow(s,'browser');const browser=[...current(s).rect];s=applyAction(s,'right');s=applyAction(s,'restore');assert.deepEqual(current(s).rect,browser);s=selectWindow(s,'code');s=applyAction(s,'restore');assert.deepEqual(current(s).rect,code);});
+test('single display move is a no-op and does not create history',()=>{const s=applyAction(createState(),'nextDisplay');assert.equal(current(s).monitor,0);assert.equal(current(s).original,null);assert.match(s.message,/2개/);});
+test('display move preserves normalized size and wraps',()=>{let s=setDisplays(createState(),2);const rect=[...current(s).rect];s=applyAction(s,'nextDisplay');assert.equal(current(s).monitor,1);assert.deepEqual(current(s).rect,rect);s=applyAction(s,'nextDisplay');assert.equal(current(s).monitor,0);});
+test('disconnecting display keeps all mock windows reachable',()=>{let s=setDisplays(createState(),2);s=applyAction(s,'nextDisplay');s=setDisplays(s,1);assert.ok(s.windows.every(w=>w.monitor===0));s=applyAction(s,'restore');assert.equal(current(s).monitor,0);});
+test('model never mutates prior state',()=>{const s=createState(),before=structuredClone(s);applyAction(s,'left');selectWindow(s,'notes');setDisplays(s,2);setCycling(s,false);assert.deepEqual(s,before);});
+test('changing layout resets cycle',()=>{let s=applyAction(createState(),'left');s=applyAction(s,'maximize');s=applyAction(s,'left');assert.equal(current(s).rect[2],.5);});
+test('missing restore and unknown actions are safe',()=>{let s=createState();s=applyAction(s,'restore');assert.match(s.message,/없습니다/);assert.deepEqual(applyAction(s,'unknown').windows,s.windows);});

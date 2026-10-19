@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="LightSnap을 설치 없이 체험하세요. 브라우저의 모의 창으로 화면 분할, 크기 순환, 모니터 이동을 테스트하는 인터랙티브 미리보기입니다.">
+<meta name="theme-color" content="#f6f5f0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>LightSnap — A little order. A lot more focus.</title>
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css">
+</head>
+<body id="top">
+<a class="skip-link" href="#playground">미리보기로 건너뛰기</a>
+<header class="nav wrap"><a class="brand" href="#top" aria-label="LightSnap 처음으로"><img src="assets/icon.svg" alt="" width="30" height="30">LightSnap<span class="version">0.2.0</span></a><nav aria-label="주 메뉴"><a href="#playground">Playground</a><a href="#how-it-works">사용 방법</a><a class="nav-github" href="https://github.com/kimyoung11/LightSnap" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a></nav></header>
+<main>
+<section class="hero wrap">
+ <div class="hero-copy"><div class="eyebrow"><span class="status-dot"></span> A LITTLE ORDER. A LOT MORE FOCUS.</div><h1>창 정리는 가볍게.<br>집중은 더 길게<span class="orange">.</span></h1><p class="hero-description">흩어진 창을 제자리에. 단축키 한 번으로<br class="desktop-br"> 나만의 작업 공간을 만드는 macOS 유틸리티.</p><div class="hero-actions"><a class="button primary" href="#playground">설치 없이 체험하기 <span aria-hidden="true">↘</span></a><a class="text-link" href="https://github.com/kimyoung11/LightSnap#빌드와-실행" target="_blank" rel="noopener noreferrer">macOS 앱 시작하기 ↗</a></div><div class="hero-footnote"><span>macOS 13+</span><i></i><span>Swift + AppKit</span><i></i><span>외부 패키지 없음</span></div></div>
+ <div class="hero-art"><div class="art-caption"><span>YOUR SPACE, IN PLACE.</span><span>⌥ + ⌘ + →</span></div><img src="assets/hero.svg" alt="Code와 Notes 창이 정돈된 화면을 표현한 LightSnap 디자인 일러스트" width="760" height="570"><div class="art-bottom"><span class="tiny-cross">✳</span> Less arranging. More doing.<span class="art-tag">ILLUSTRATION</span></div></div>
+</section>
+<div class="wrap divider"><span>SMALL TOOL. BETTER FLOW.</span><span>01 — TRY IT YOURSELF</span></div>
+<section class="playground-section wrap" id="playground" aria-labelledby="playground-title">
+ <div class="section-heading"><div><div class="eyebrow">THE PLAYGROUND</div><h2 id="playground-title">먼저, 직접 정리해 보세요.</h2></div><p>아래는 브라우저 안의 모의 화면입니다.<br>실제 Mac 창이나 시스템 설정에는 접근하지 않습니다.</p></div>
+ <div class="workbench">
+  <aside class="controls" aria-label="창 배치 컨트롤">
+   <div class="control-heading"><span class="control-number">01</span><span>창 선택</span></div>
+   <div class="app-picker" id="app-picker" aria-label="배치할 모의 창"></div>
+   <div class="control-heading"><span class="control-number">02</span><span>원하는 배치</span></div>
+   <div class="preset-tabs" role="group" aria-label="배치 종류"><button data-group="halves" aria-pressed="true">½ 분할</button><button data-group="quarters" aria-pressed="false">4분할</button><button data-group="sixths" aria-pressed="false">6분할</button><button data-group="thirds" aria-pressed="false">⅓ · ⅔</button></div>
+   <div class="layout-buttons" id="layout-buttons" aria-label="배치 선택"></div>
+   <div class="utility-buttons"><button data-action="maximize"><span aria-hidden="true">⤢</span> 최대화</button><button data-action="restore"><span aria-hidden="true">↶</span> 복원</button></div>
+   <div class="control-heading extra"><span class="control-number">03</span><span>작업 흐름</span></div>
+   <label class="switch-row"><span>좌우 크기 순환 <small>½ → ⅔ → ⅓</small></span><input type="checkbox" id="cycle-toggle" checked><span class="switch" aria-hidden="true"></span></label>
+   <button class="monitor-move" data-action="nextDisplay"><span aria-hidden="true">▣ → ▣</span> 다음 모니터로 이동</button>
+   <p class="control-note">단축키 조합과 로그인 자동 실행은<br>실제 macOS 앱에서 사용할 수 있어요.</p>
+  </aside>
+  <div class="workspace-panel"><div class="workspace-toolbar"><div class="live-indicator"><span></span> LIVE DEMO <span class="simulated">SIMULATED</span></div><div class="workspace-actions"><button id="display-toggle" aria-pressed="false">모니터 1개 <span aria-hidden="true">＋</span></button><button id="reset" aria-label="데모 초기화">초기화 ↻</button></div></div>
+   <div class="desktop-board" id="desktop-board" tabindex="0" role="region" aria-label="키보드로 조작 가능한 모의 데스크톱. 화살표, 숫자 1부터 6, Enter, Backspace를 사용할 수 있습니다."></div>
+   <div class="workspace-status"><span class="status-icon" aria-hidden="true">↳</span><output id="status" aria-live="polite"></output><span id="active-badge"></span></div>
+   <div class="keyboard-hint"><span>모의 화면을 선택한 뒤 키보드로도 체험하세요</span><span><kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd><b>·</b><kbd>1</kbd>–<kbd>6</kbd><b>·</b><kbd>↩</kbd><b>·</b><kbd>⌫</kbd></span></div>
+  </div>
+ </div>
+ <p class="simulation-note"><span aria-hidden="true">ⓘ</span> 이 미리보기는 실제 앱의 배치 방식을 재현한 시뮬레이션입니다. 네이티브 단축키·접근성 권한·실제 성능 검증을 대신하지 않습니다.</p>
+</section>
+<section class="details wrap" id="how-it-works"><div class="details-intro"><div class="eyebrow">FIND YOUR FLOW</div><h2>손은 키보드에.<br>창은 제자리에.</h2><p>복잡한 설정 없이 시작하고,<br>익숙해지면 나만의 조합으로.</p></div><div class="feature-list"><article><span class="feature-index">01 /</span><div><h3>필요한 만큼, 딱 맞게.</h3><p>절반부터 4분할, 6분할, ⅓·⅔까지.<br>Dock과 메뉴 막대를 제외한 작업 영역에 맞춰요.</p></div><span class="feature-symbol" aria-hidden="true">▥</span></article><article><span class="feature-index">02 /</span><div><h3>같은 키로, 다른 크기.</h3><p>좌우 단축키를 반복하면 ½ → ⅔ → ⅓.<br>여러 모니터 사이에서도 작업을 이어가세요.</p></div><span class="feature-symbol" aria-hidden="true">⇥</span></article><article><span class="feature-index">03 /</span><div><h3>Mac 안에서만, 조용하게.</h3><p>네이티브 앱에는 외부 API·분석 SDK가 없습니다.<br>로그인 자동 실행과 메뉴 막대 상주를 지원해요.</p></div><span class="feature-symbol" aria-hidden="true">⌘</span></article></div></section>
+<section class="start-section wrap"><div><div class="eyebrow">READY FOR YOUR REAL DESKTOP?</div><h2>이제, 내 Mac에서도.</h2><p>소스를 빌드하고 접근성 권한을 허용하면 시작할 수 있습니다.</p></div><a class="button dark" href="https://github.com/kimyoung11/LightSnap#빌드와-실행" target="_blank" rel="noopener noreferrer">GitHub에서 시작하기 ↗</a></section>
+</main><footer class="wrap footer"><a class="brand" href="#top"><img src="assets/icon.svg" alt="" width="24" height="24">LightSnap</a><p>Native utility. A calmer desktop.</p><span>웹 데모는 로그인 자동 실행·실제 창 제어를 수행하지 않습니다.</span></footer>
+<script type="module" src="app.mjs"></script>
+</body></html>

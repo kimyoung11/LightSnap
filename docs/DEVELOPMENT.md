@@ -62,3 +62,17 @@ git diff --check
 ## 작업 종료 인계
 
 변경한 동작, 검사 명령/결과, 수동 미확인 항목, 저장 형식·권한·리소스 영향, 다음 작업을 HANDOFF의 템플릿으로 요약한다. 코드와 제안 로드맵을 혼동하지 않는다.
+
+## 브라우저 미리보기 수정
+
+`preview/`는 앱 기능을 보여주는 별도 정적 페이지다. `model.mjs`가 Swift 동작을 수동으로 재현하며 실제 AX·Carbon 코드를 실행하지 않는다. 기능이 바뀌면 두 구현의 의미가 같은지 검토한다.
+
+```sh
+node --test preview/model.test.mjs
+node --check preview/app.mjs
+python3 -m http.server 4173 --bind 127.0.0.1 --directory preview
+```
+
+웹 검사에는 Node.js가 필요하지만 네이티브 앱 빌드에는 필요 없다. 브라우저에서 배치·반복·복원·모니터 전환·키보드·작은 화면을 확인한다. README의 캡처와 배너는 브라우저 데모/디자인 일러스트라고 구분한다.
+
+호스팅 정보는 `preview/hosting.json`, 게시 방법과 비공개 범위는 `preview/README.md`에 있다. 실제 배포 체크아웃은 별도 Sites 프로젝트로 관리한다. 저장소 공개 여부를 바꿔도 Sites 방문 범위가 함께 바뀌지는 않는다.

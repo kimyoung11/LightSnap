@@ -25,6 +25,11 @@ jobs:
         run: swift --version
       - name: Regression checks
         run: ./scripts/test.sh
+      - name: Preview model checks
+        run: |
+          node --test preview/model.test.mjs
+          node --check preview/app.mjs
+          node --check preview/model.mjs
       - name: Build local application
         run: ./scripts/build-app.sh
       - name: Validate bundle and signature
