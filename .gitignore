@@ -1,0 +1,42 @@
+# Swift build products
+.build/
+.swiftpm/
+dist/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# Local profiles and crash logs can contain usernames and paths
+reports/
+*-profile.json
+*diagnostics*.json
+*.ips
+*.crash
+*.log
+
+# Credentials and signing material
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.mobileprovision
+*.provisionprofile
+*.keychain
+*.keychain-db
+.netrc
+.npmrc
+
+# Distributable binaries are not source files
+*.app/
+*.zip
+*.dmg
+*.pkg
+
+# Local tooling and OS metadata
+.DS_Store
+.AppleDouble
+.vscode/
+.idea/
