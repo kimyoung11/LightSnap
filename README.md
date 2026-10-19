@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://lightsnap-playground.platform-5985.chatgpt.site"><img src="preview/assets/readme-banner.svg" alt="LightSnap — A little order. A lot more focus. 모의 화면 디자인 일러스트" width="100%"></a>
+<a href="https://github.com/kimyoung11/LightSnap/raw/refs/heads/main/preview/standalone.html"><img src="preview/assets/readme-banner.svg" alt="LightSnap — A little order. A lot more focus. 모의 화면 디자인 일러스트" width="100%"></a>
 
 # LightSnap
 
@@ -10,21 +10,23 @@
 
 <img src="preview/assets/badges.svg" alt="v0.2.0 · macOS 13 이상 · Swift 5.9 이상 · Native AppKit · 외부 패키지 없음" width="580">
 
-[**설치 없이 체험하기 ↗**](https://lightsnap-playground.platform-5985.chatgpt.site) &nbsp; · &nbsp; [앱 시작하기](#빌드와-실행) &nbsp; · &nbsp; [단축키](#기본-단축키) &nbsp; · &nbsp; [개발 문서](#개발-인수인계와-확장-계획)
+[**미리보기 HTML 다운로드 ↓**](https://github.com/kimyoung11/LightSnap/raw/refs/heads/main/preview/standalone.html) &nbsp; · &nbsp; [앱 시작하기](#빌드와-실행) &nbsp; · &nbsp; [단축키](#기본-단축키) &nbsp; · &nbsp; [개발 문서](#개발-인수인계와-확장-계획)
 
 </div>
 
-> 현재 GitHub 저장소와 호스팅 미리보기는 **비공개**입니다. 접근 권한이 있는 계정에서 열 수 있으며, 소스 공개와 미리보기 공유 범위는 각각 별도로 설정합니다.
+> 저장소는 **비공개**로 유지합니다. 미리보기는 로그인 연동 없는 **단일 HTML 파일**입니다. 파일을 받아 브라우저로 열거나 그대로 다른 사람에게 전달하면 됩니다. 비공개 GitHub에서 파일을 내려받을 때만 저장소 접근 권한이 필요합니다.
 
 ---
 
 ## 먼저, 직접 정리해 보세요
 
-**[Playground 열기 →](https://lightsnap-playground.platform-5985.chatgpt.site)**
+**[미리보기 HTML 다운로드 ↓](https://github.com/kimyoung11/LightSnap/raw/refs/heads/main/preview/standalone.html)**
 
-설치·macOS 권한 설정 없이 모의 창을 선택하고 배치해 볼 수 있습니다. 모바일 브라우저에서도 동작합니다.
+`standalone.html`을 다운로드한 뒤 **더블클릭해 브라우저로 열면 됩니다.** ChatGPT 연결·앱 설치·로컬 서버가 필요 없습니다. 모의 창을 선택하고 배치할 수 있고, 파일 자체를 다른 사람에게 공유할 수도 있습니다.
 
-<a href="https://lightsnap-playground.platform-5985.chatgpt.site"><img src="preview/assets/playground.png" alt="LightSnap 브라우저 시뮬레이션에서 Notes와 Code 모의 창을 좌우 절반으로 배치한 화면" width="100%"></a>
+GitHub의 HTML 파일 화면은 코드를 보여줍니다. Raw 다운로드 버튼으로 파일을 저장해 주세요.
+
+<a href="https://github.com/kimyoung11/LightSnap/raw/refs/heads/main/preview/standalone.html"><img src="preview/assets/playground.png" alt="LightSnap 브라우저 시뮬레이션에서 Notes와 Code 모의 창을 좌우 절반으로 배치한 화면" width="100%"></a>
 
 | 직접 체험할 수 있는 것 | 해보는 방법 |
 | --- | --- |
@@ -141,7 +143,7 @@ tccutil reset Accessibility dev.lightsnap.mac
 
 진단 JSON에는 실행 경로·사용자 폴더 이름·PID·앱 이름·시스템 버전 등이 포함될 수 있습니다. footprint와 RSS는 별도로 측정하며 스냅 시간은 물리 키 입력·화면 렌더링을 포함하지 않습니다. 자세한 정의와 검증 범위는 [VALIDATION.md](VALIDATION.md), 개인정보 안내는 [SECURITY.md](SECURITY.md)에 정리했습니다.
 
-웹 미리보기도 외부 API·분석 SDK·원격 폰트 없이 동작합니다. 브라우저 데모의 상태는 메모리에만 유지하며, 페이지의 HTTP 요청 자체는 호스팅 서비스가 처리합니다.
+단일 HTML에는 스타일·스크립트·이미지가 모두 포함됩니다. ChatGPT·외부 API·분석 SDK·원격 폰트·호스팅 인증에 연결하지 않으며, 상태는 브라우저 메모리에만 유지됩니다. GitHub 이동 링크는 직접 클릭할 때만 열립니다.
 
 ## 개발과 기여
 
@@ -152,11 +154,14 @@ tccutil reset Accessibility dev.lightsnap.mac
 # 브라우저 시뮬레이션 검사 (Node.js 필요)
 node --test preview/model.test.mjs
 
-# 웹 미리보기 로컬 실행
-python3 -m http.server 4173 --bind 127.0.0.1 --directory preview
+# 단일 HTML 다시 생성
+node scripts/build-preview.mjs
+
+# macOS에서 미리보기 열기
+open preview/standalone.html
 ```
 
-로컬 웹 주소: `http://127.0.0.1:4173`. 웹 미리보기의 구조·검사·게시 범위는 [preview/README.md](preview/README.md)를 참고하세요. 기여 방법은 [CONTRIBUTING.md](CONTRIBUTING.md)에 있습니다.
+웹 미리보기의 구조·검사·정적 웹 호스팅 방법은 [preview/README.md](preview/README.md)를 참고하세요. 기여 방법은 [CONTRIBUTING.md](CONTRIBUTING.md)에 있습니다.
 
 <details>
 <summary><b>네이티브 검사 · 프로파일링 · 서명 안내</b></summary>

@@ -30,6 +30,7 @@ jobs:
           node --test preview/model.test.mjs
           node --check preview/app.mjs
           node --check preview/model.mjs
+          node scripts/build-preview.mjs --check
       - name: Build local application
         run: ./scripts/build-app.sh
       - name: Validate bundle and signature

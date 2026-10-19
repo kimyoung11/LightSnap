@@ -75,4 +75,4 @@ python3 -m http.server 4173 --bind 127.0.0.1 --directory preview
 
 웹 검사에는 Node.js가 필요하지만 네이티브 앱 빌드에는 필요 없다. 브라우저에서 배치·반복·복원·모니터 전환·키보드·작은 화면을 확인한다. README의 캡처와 배너는 브라우저 데모/디자인 일러스트라고 구분한다.
 
-호스팅 정보는 `preview/hosting.json`, 게시 방법과 비공개 범위는 `preview/README.md`에 있다. 실제 배포 체크아웃은 별도 Sites 프로젝트로 관리한다. 저장소 공개 여부를 바꿔도 Sites 방문 범위가 함께 바뀌지는 않는다.
+기본 배포물은 `preview/standalone.html` 단일 HTML이다. `node scripts/build-preview.mjs`로 생성하고 `node scripts/build-preview.mjs --check`로 소스 일치성을 확인한다. 로그인이나 서버 없이 파일을 직접 열 수 있다. 외부 Sites 연동은 사용하지 않는다. 정적 웹 호스팅을 원하면 같은 파일을 index.html로 제공할 수 있으며, 저장소 공개 범위는 사용자 결정으로 유지한다.

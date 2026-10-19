@@ -59,4 +59,6 @@ docs/ARCHITECTURE.md, docs/DEVELOPMENT.md를 읽어 주세요.
 
 ## 브라우저 체험 페이지
 
-README는 `preview/`의 정적 체험 페이지와 연결되어 있다. 현재 소스와 사이트는 모두 비공개이며 공개 전환은 사용자가 직접 결정한다. 웹 데모와 네이티브 앱은 별도 구현이다. 다른 LLM은 `preview/README.md`와 `preview/hosting.json`을 확인하고, 기존 Sites ID를 재사용한다. 새 프로젝트를 중복 생성하거나 사이트/저장소를 임의 공개하지 않는다.
+미리보기는 `preview/standalone.html` 단일 파일로 제공한다. 스타일·스크립트·이미지를 포함하여 파일을 직접 열 수 있고 ChatGPT 연결·로그인·서버가 필요 없다. 원본은 `preview/index.html`, CSS, JS이고 `node scripts/build-preview.mjs`로 단일 HTML을 갱신한다. `--check`로 생성물 일치성을 검사한다.
+
+이전 외부 Sites 주소는 README에서 제거했다. 외부 호스팅은 현재 미리보기 실행의 필수 요소가 아니다. 저장소는 계속 비공개이며 사용자가 직접 공개 범위를 결정한다. 웹 모델은 실제 macOS 창 제어를 실행하지 않는다.
