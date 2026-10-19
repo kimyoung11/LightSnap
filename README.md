@@ -159,3 +159,17 @@ scripts/               빌드·검사·프로파일링
 ## 라이선스
 
 현재 라이선스는 지정하지 않았습니다. 저장소 관리자가 결정하면 별도 LICENSE 파일로 추가합니다.
+
+## 개발 인수인계와 확장 계획
+
+다른 개발자나 LLM이 대화 기록 없이 이어서 작업할 수 있도록 문서를 분리했습니다. 계획 문서는 현재 구현과 구분해 주세요.
+
+| 문서 | 내용 |
+| --- | --- |
+| [AGENTS.md](AGENTS.md) | AI·개발자 공통 시작점과 유지할 조건 |
+| [HANDOFF](docs/HANDOFF.md) | 현재 상태, 알려진 문제, 그대로 전달할 시작 프롬프트 |
+| [ARCHITECTURE](docs/ARCHITECTURE.md) | 스레드·좌표·배치·저장 형식·마이그레이션 계약 |
+| [DEVELOPMENT](docs/DEVELOPMENT.md) | 기능별 수정 위치·검사·버전업 절차 |
+| [ROADMAP](docs/ROADMAP.md) | 기능 제안, 우선순위와 완료 조건 |
+| [SECURITY_AND_LOGGING](docs/SECURITY_AND_LOGGING.md) | 익명화·보안 검사·오류 코드·로그 제안 |
+| [RELEASING](docs/RELEASING.md) | 현재 빌드와 정식 서명·공증·릴리스 도입안 |
