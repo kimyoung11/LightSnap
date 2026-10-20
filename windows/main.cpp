@@ -54,7 +54,7 @@ void refreshBinding(){int i=static_cast<int>(SendMessageW(combo,CB_GETCURSEL,0,0
     SendMessageW(keyControl,HKM_SETHOTKEY,MAKEWORD(b.key,mods),0);
     std::wstring text=L"현재: "+bindingName(b);if(b.key&&!registered[i]&&!paused&&!editing)text+=L" · 등록 실패 (다른 앱 사용 여부 확인)";SetWindowTextW(bindingControl,text.c_str());
 }
-void registrationStatus(){int n=registerKeys();refreshBinding();if(n)status(L"단축키 "+std::to_wstring(n)+L"개 등록 실패 · 각 조합을 확인하세요.");}
+int registrationStatus(){int n=registerKeys();refreshBinding();if(n)status(L"단축키 "+std::to_wstring(n)+L"개 등록 실패 · 각 조합을 확인하세요.");return n;}
 void endEditing(){if(editing){editing=false;registerKeys();}}
 LRESULT CALLBACK hotkeyProc(HWND w,UINT msg,WPARAM wp,LPARAM lp,UINT_PTR,DWORD_PTR){
     if(msg==WM_SETFOCUS){editing=true;unregisterKeys();status(L"단축키 편집 중 · Ctrl이 포함된 조합을 입력하고 저장하세요.");}
@@ -208,13 +208,13 @@ LRESULT CALLBACK wndproc(HWND w,UINT msg,WPARAM wp,LPARAM lp){
             if(!valid(b)){status(L"Ctrl이 포함된 조합을 입력하세요. Windows 키 조합은 지원하지 않습니다.");return 0;}
             if(conflicts(settings,static_cast<size_t>(i),b)){status(L"다른 동작에 사용 중인 조합입니다. 기존 설정을 유지합니다.");return 0;}
             auto candidate=settings;candidate.bindings[i]=b;editing=false;unregisterKeys();
-            if(b.key&&!paused&&!RegisterHotKey(ui,2000,b.mods|MOD_NOREPEAT,b.key)){registrationStatus();status(L"다른 앱이 사용 중인 단축키입니다. 기존 설정을 유지합니다.");return 0;}UnregisterHotKey(ui,2000);
-            if(save(candidate)){registrationStatus();status(L"단축키 저장 완료");}else registrationStatus();return 0;
+            if(b.key&&!RegisterHotKey(ui,2000,b.mods|MOD_NOREPEAT,b.key)){registrationStatus();status(L"다른 앱이 사용 중인 단축키입니다. 기존 설정을 유지합니다.");return 0;}UnregisterHotKey(ui,2000);
+            if(save(candidate)){if(registrationStatus()==0)status(L"단축키 저장 완료");}else registrationStatus();return 0;
         }
         if(id==ID_DEFAULT){if(MessageBoxW(ui,L"모든 단축키를 기본값으로 바꿀까요?",L"LightSnap",MB_YESNO|MB_ICONQUESTION)==IDYES){auto candidate=defaults();candidate.cycle=settings.cycle;if(save(candidate)){endEditing();registrationStatus();}}return 0;}
         if(id==ID_CYCLE){auto candidate=settings;candidate.cycle=SendMessageW(cycleControl,BM_GETCHECK,0,0)==BST_CHECKED;if(!save(candidate))SendMessageW(cycleControl,BM_SETCHECK,settings.cycle?BST_CHECKED:BST_UNCHECKED,0);return 0;}
         if(id==ID_STARTUP){bool enabled=SendMessageW(startupControl,BM_GETCHECK,0,0)==BST_CHECKED;bool ok=setStartup(enabled);SendMessageW(startupControl,BM_SETCHECK,startupEnabled()?BST_CHECKED:BST_UNCHECKED,0);status(ok?(enabled?L"자동 실행 등록됨 · Windows 시작 앱 설정의 차단 상태도 확인하세요.":L"자동 실행 해제됨"):L"자동 실행 변경 실패 · 사용자 레지스트리 접근을 확인하세요.");return 0;}
-        if(id==ID_PAUSE){paused=!paused;SetWindowTextW(pauseControl,paused?L"다시 시작":L"일시 정지");endEditing();registrationStatus();status(paused?L"스냅 일시 정지됨":L"스냅 다시 시작됨");return 0;}
+        if(id==ID_PAUSE){paused=!paused;SetWindowTextW(pauseControl,paused?L"다시 시작":L"일시 정지");endEditing();int failures=registrationStatus();if(paused||failures==0)status(paused?L"스냅 일시 정지됨":L"스냅 다시 시작됨");return 0;}
         if(id==ID_DIAG){diagnostics();return 0;}
         if(id==ID_QUIT){unregisterKeys();if(foregroundHook)UnhookWinEvent(foregroundHook);if(destroyHook)UnhookWinEvent(destroyHook);if(worker.joinable())worker.join();Shell_NotifyIconW(NIM_DELETE,&tray);DestroyWindow(w);return 0;}break;}
     case WM_DESTROY:if(font)DeleteObject(font);PostQuitMessage(0);return 0;
