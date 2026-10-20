@@ -1,5 +1,10 @@
 # 다른 LLM / 개발자에게 인계하기
 
+## Windows 추가 (2026-10-20)
+
+Windows 0.1.0의 구현·빌드·저장 계약·검증은 [`windows/README.md`](../windows/README.md)와 [`VALIDATION.md`](../VALIDATION.md)를 먼저 확인한다. `windows/core.hpp`는 순수 계산·설정, `windows/main.cpp`는 Win32 UI·창 제어다. 기존 Swift와 macOS 0.2.0 동작은 유지한다. 아래 기존 설명은 macOS 기준이다.
+
+
 ## 문서의 기준
 
 0.2.0 코드 기준으로 작성했습니다. 대화 기록이나 특정 AI 서비스 계정 없이 이 저장소만으로 개발을 이어가는 것이 목표입니다. 현재 동작은 소스를 우선하고, 제안 문서를 이미 구현된 기능으로 해석하지 마세요.

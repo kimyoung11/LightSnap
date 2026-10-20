@@ -1,4 +1,14 @@
-# Validation — LightSnap 0.2.0
+# Validation — macOS 0.2.0 / Windows 0.1.0
+
+## Windows 첫 이식 — 2026-10-20
+
+- Mac의 Apple clang C++17에서 core 검사 127개 통과: 음수/홀수 화면 경계, 비례 이동, 순환 조건, 설정 해제 보존·손상·중복 거부.
+- Windows x64 EXE 크로스 컴파일과 Windows MSVC CI 결과는 이 작업의 최종 확인 후 기록합니다.
+- Windows CI는 core 검사와 숨겨진 자기 창/임시 설정 파일의 `--self-test`를 실행합니다. 외부 앱·사용자 레지스트리·전역 키를 변경하지 않습니다.
+- **미확인:** 실제 Windows 데스크톱에서 전역 키·다른 앱 이동/복원·100/125/150/200% 혼합 DPI·모니터 연결 해제·트레이/UI·로그인 실행·장시간 리소스. 자동 검사 통과는 이 수동 확인을 대신하지 않습니다.
+- Windows 메모리는 작업 집합·전용 메모리(MiB)이며 macOS footprint(MB)와 직접 같은 지표가 아닙니다. Windows 정식 서명·SmartScreen 평판·ARM64 빌드는 미제공입니다.
+
+## 기존 macOS 검증 기록
 
 검증 기록: 2026-10-19
 

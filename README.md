@@ -6,7 +6,7 @@
 
 **창 정리는 가볍게. 집중은 더 길게.**
 
-단축키로 나만의 작업 공간을 만드는 macOS 메뉴 막대 유틸리티.
+단축키로 나만의 작업 공간을 만드는 **macOS 메뉴 막대 · Windows 트레이 유틸리티**.
 
 <img src="preview/assets/badges.svg" alt="v0.2.0 · macOS 13 이상 · Swift 5.9 이상 · Native AppKit · 외부 패키지 없음" width="580">
 
@@ -17,6 +17,17 @@
 > 저장소는 **비공개**로 유지합니다. 미리보기는 로그인 연동 없는 **단일 HTML 파일**입니다. 파일을 받아 브라우저로 열거나 그대로 다른 사람에게 전달하면 됩니다. 비공개 GitHub에서 파일을 내려받을 때만 저장소 접근 권한이 필요합니다.
 
 ---
+
+## 플랫폼별 시작
+
+| 플랫폼 | 현재 버전 | 구현 / 시작하기 |
+| --- | --- | --- |
+| macOS 13+ | 0.2.0 | Swift · AppKit · 기존 [빌드와 실행](#빌드와-실행) |
+| Windows 10 1607+ / 11 x64 | 0.1.0 첫 버전 | C++ · Win32 · **[Windows 실행·단축키·빌드 안내](windows/README.md)** |
+
+Windows판은 절반·4/6분할·⅓·⅔·최대화·최초 배치 복원·다음 모니터·좌우 크기 순환·단축키 편집·로그인 실행·트레이와 진단을 구현합니다. 기본 단축키는 **Ctrl+Alt**, 다음 모니터는 **Ctrl+Alt+Shift+→**입니다. Electron·.NET 설치와 계정 연결이 필요 없습니다.
+
+Windows 배포 ZIP은 [Actions의 Native CI](https://github.com/kimyoung11/LightSnap/actions/workflows/ci.yml) 실행 결과의 **LightSnap-0.1.0-Windows-x64** 아티팩트에서 받습니다. 압축을 풀고 `LightSnap.exe`를 실행하세요. 첫 버전은 서명되지 않은 테스트 빌드입니다. 자동 검사와 실제 Windows 데스크톱 수동 검증 범위는 [검증 기록](VALIDATION.md)에 구분합니다. 아래 macOS 권한·키 설명은 Mac 전용입니다.
 
 ## 먼저, 직접 정리해 보세요
 
@@ -53,6 +64,8 @@ GitHub의 HTML 파일 화면은 코드를 보여줍니다. Raw 다운로드 버�
 ---
 
 ## 빌드와 실행
+
+이 절은 macOS용입니다. Windows는 [별도 안내](windows/README.md)를 사용하세요.
 
 **필요 환경:** macOS 13 이상, Swift 5.9 이상, Xcode Command Line Tools 또는 Xcode. 외부 Swift 패키지는 없습니다.
 

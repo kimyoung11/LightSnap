@@ -13,7 +13,7 @@ codesign --verify --strict --verbose dist/LightSnap.app
 
 기본은 ad-hoc 서명, 빌드한 Mac의 아키텍처용 앱이다. 환경변수 `LIGHTSNAP_SIGN_IDENTITY`에 설치된 인증서를 지정하면 hardened runtime·timestamp 옵션으로 서명한다. 이 옵션만으로 공증이나 Gatekeeper 검증까지 완료되지는 않는다.
 
-현재 CI는 소스 checkout → 도구 버전 → 회귀 검사 → 로컬 앱 빌드 → plist/서명 검증만 수행한다. 인증서·공증·Release 업로드·태그 빌드·비밀정보 전용 스캔은 없다. 한 번의 macos-latest 빌드는 두 아키텍처 검증이 아니다.
+macOS CI job은 소스 checkout → 도구 버전 → 회귀 검사 → 로컬 앱 빌드 → plist/서명 검증을 수행한다. Windows job은 MSVC x64 빌드·CTest 후 서명되지 않은 테스트 ZIP과 체크섬을 14일 아티팩트로 저장한다. GitHub Release 공개는 수행하지 않는다. 인증서·공증·Release 업로드·태그 빌드·비밀정보 전용 스캔은 없다. 한 번의 macos-latest 빌드는 두 아키텍처 검증이 아니다.
 
 ## R01 — 버전 원본과 릴리스 메타데이터 (우선)
 
@@ -78,3 +78,7 @@ shasum -a 256 dist/LightSnap-final.zip > dist/LightSnap-final.zip.sha256
 - [ ] 정식 배포라면 서명·공증·staple·Gatekeeper 확인
 - [ ] 최종 압축 파일에서 재검사, 체크섬 기록
 - [ ] 성능 주장은 측정 조건과 표본을 포함해 기록
+
+## Windows 테스트 배포
+
+`windows/README.md`의 CMake Release와 CTest를 먼저 통과시킨다. CI 아티팩트의 ZIP은 EXE와 Windows README만 포함하며 SHA256.txt를 함께 제공한다. MSVC 런타임은 정적 링크한다. 소스 ZIP에 빌드 폴더·PDB·개인 설정을 포함하지 않는다. 정식 Authenticode 인증서 서명과 설치 프로그램·자동 업데이트는 후속 작업이다. 키나 인증서를 저장소에 넣지 않는다. 서명되지 않은 테스트 빌드를 SmartScreen 검증 완료로 안내하지 않는다.

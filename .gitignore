@@ -40,3 +40,10 @@ reports/
 .AppleDouble
 .vscode/
 .idea/
+
+# Windows local builds
+windows/build/
+*.exe
+*.obj
+*.pdb
+*.res
