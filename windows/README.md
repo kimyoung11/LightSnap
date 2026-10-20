@@ -4,7 +4,7 @@ macOS판의 배치 정책을 옮긴 **Windows 10 1607 이상 / Windows 11 x64용
 
 ## 실행
 
-1. ZIP을 원하는 고정 폴더에 **모두 압축 해제**합니다.
+1. **[Windows ZIP 다운로드](https://github.com/kimyoung11/LightSnap/releases/download/windows-v0.1.0/LightSnap-0.1.0-Windows-x64.zip)** 후 계속 사용할 폴더에 **모두 압축 해제**합니다.
 2. `LightSnap.exe`를 실행합니다. 처음에는 설정 창이 열립니다.
 3. 메모장이나 브라우저의 일반 창을 선택하고 `Ctrl+Alt+←`를 누릅니다.
 4. 설정 창을 닫으면 알림 영역(트레이)에 남습니다. 숨겨진 아이콘의 LightSnap을 열어 설정·진단·종료를 사용할 수 있습니다.
@@ -52,7 +52,7 @@ ctest --test-dir windows/build -C Release --output-on-failure
 .\windows\build\Release\LightSnap.exe
 ```
 
-Release는 MSVC 런타임을 정적으로 링크합니다. CI도 같은 빌드와 검사를 실행하고 **Actions → Native CI → LightSnap-0.1.0-Windows-x64** 아티팩트에 ZIP과 SHA-256을 보관합니다(14일). 비공개 저장소의 아티팩트를 받으려면 저장소 접근 권한이 필요하지만 EXE 실행에는 로그인이 필요 없습니다.
+Release는 MSVC 런타임을 정적으로 링크합니다. 사용자 배포본은 **[GitHub Releases](https://github.com/kimyoung11/LightSnap/releases/tag/windows-v0.1.0)**에서 ZIP과 SHA-256으로 제공합니다. Release 첨부 파일에는 Actions 아티팩트의 14일 보관 기간이 적용되지 않습니다. EXE 실행에는 로그인이 필요 없습니다. CI 빌드도 Actions에서 별도로 확인할 수 있습니다.
 
 Mac/Linux에서는 별도 설치한 [Zig](https://ziglang.org/download/) 0.17.0으로 `ZIG=/absolute/path/to/zig ./scripts/build-windows.sh` 크로스 컴파일도 가능합니다. 스크립트가 도구를 자동 다운로드하지 않으며 Windows 실행 검증을 대신하지 않습니다.
 
