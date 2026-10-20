@@ -3,7 +3,9 @@
 ## Windows 0.1.1 보안 보강
 
 - 사용자 보고: V3에서 EXE 실행 시 ‘한 번만 실행’ 선택지. 정확한 경고 전문·제품/엔진 버전·악성코드 진단명은 미제공으로 평판 알림으로 추정하며 악성 진단 확정/오탐 해제로 기록하지 않습니다.
-- 로컬 PE 검사기 회귀 7개와 Windows core 127개 통과. MSVC 빌드/PE 게이트/Defender 보고 결과는 CI 산출물을 확인해 추가 기록합니다.
+- 로컬 PE 검사기 회귀 7개와 Windows core 127개 통과. [4a165b3 CI](https://github.com/kimyoung11/LightSnap/actions/runs/39433100992)에서 macOS/Windows job 전체 통과했습니다.
+- MSVC 0.1.1 Release와 Win32/core CTest 2/2 통과, 실제 EXE의 9개 PE 보호 검사 모두 통과했습니다. 다운로드한 EXE/보고서/ZIP SHA-256 일치 확인했습니다.
+- 해당 CI의 Microsoft Defender 검사 결과: `scan_completed_no_threat_reported` (엔진 `1.1.26090.9`, 정의 `1.461.118.0`). 이는 CI 호스트의 해당 시점 파일 검사이며 V3 또는 사용자 PC 실행 검사 결과가 아닙니다. Authenticode: `NotSigned`.
 - V3 실환경 검사·안랩 분석·신뢰 인증서 서명은 완료하지 않았습니다. 보호 옵션과 체크섬 검사는 이 세 항목을 대신하지 않습니다.
 
 ## Windows 첫 이식 — 2026-10-20

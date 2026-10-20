@@ -64,6 +64,7 @@ jobs:
           New-Item -ItemType Directory -Force dist/windows-x64 | Out-Null
           Copy-Item windows/build/Release/LightSnap.exe dist/windows-x64/
           Copy-Item windows/README.md dist/windows-x64/README.md
+          Copy-Item docs/WINDOWS_SECURITY.md dist/windows-x64/SECURITY.md
           Copy-Item windows/build/security-report.json dist/windows-x64/
           Copy-Item windows/build/antivirus-report.json dist/windows-x64/
           $exeHash = (Get-FileHash dist/windows-x64/LightSnap.exe -Algorithm SHA256).Hash.ToLowerInvariant()

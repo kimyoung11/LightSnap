@@ -18,7 +18,7 @@ macOS판의 배치 정책을 옮긴 **Windows 10 1607 이상 / Windows 11 x64용
 - CFG·스택 보호·ASLR·DEP를 MSVC에 명시하고, CI가 실제 PE 보호 정보를 검사합니다.
 - ZIP에는 `security-report.json`, `antivirus-report.json`, `LightSnap.exe.sha256`도 포함합니다. Defender 검사 가능 여부와 결과, 서명 상태를 기록하며 V3는 별도 미검증으로 표시합니다.
 - 현재 코드 서명용 신뢰 인증서가 제공되지 않아 **미서명**입니다. 서명은 배포자 확인·변조 방지에 필요하지만 백신/평판 경고의 제거를 보장하지 않습니다.
-- [보안 보강 내용과 정식 서명·안랩 문의 절차](../docs/WINDOWS_SECURITY.md)를 확인하세요. EXE를 실행하기 전에 읽을 수 있습니다. V3 설정이나 예외 목록을 앱이 변경하지 않습니다.
+- [보안 보강 내용과 정식 서명·안랩 문의 절차](https://github.com/kimyoung11/LightSnap/blob/main/docs/WINDOWS_SECURITY.md)를 확인하세요. ZIP의 `SECURITY.md`로도 EXE 실행 전에 읽을 수 있습니다. V3 설정이나 예외 목록을 앱이 변경하지 않습니다.
 
 ## 기본 단축키
 

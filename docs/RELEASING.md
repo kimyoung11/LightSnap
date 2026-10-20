@@ -86,3 +86,7 @@ shasum -a 256 dist/LightSnap-final.zip > dist/LightSnap-final.zip.sha256
 ## Windows 0.1.0 수동 Release
 
 `windows-v0.1.0`은 첫 테스트 버전으로 prerelease 표시한다. 검증된 8dd9013 MSVC 실행 파일은 그대로 유지하고 설치 README만 갱신하여 ZIP과 SHA-256을 제공한다. 정식 코드 서명과 실제 데스크톱 수동 검증은 별도다.
+
+## Windows 0.1.1 보안 증거
+
+MSVC CFG/GS/SDL·ASLR/DEP/CET 호환 표시와 실제 PE 게이트, 요청한 파일에 대한 CI 호스트 Defender 검사 결과를 추가한다. Release에는 EXE·README·SECURITY.md·EXE 체크섬과 두 검사 JSON을 포함한다. `NotSigned`, `V3: not_tested`를 보존하며 Defender 결과를 V3 무탐지나 알림 해제로 표현하지 않는다. 정식 서명은 신뢰 인증서가 준비된 뒤 별도 수행한다.
