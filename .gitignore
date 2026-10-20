@@ -47,3 +47,6 @@ windows/build/
 *.obj
 *.pdb
 *.res
+
+__pycache__/
+*.pyc

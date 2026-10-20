@@ -25,6 +25,8 @@ jobs:
         run: swift --version
       - name: Regression checks
         run: ./scripts/test.sh
+      - name: Binary security gate regression tests
+        run: python3 -m unittest discover -s scripts -p test_windows_binary.py
       - name: Preview model checks
         run: |
           node --test preview/model.test.mjs
@@ -51,20 +53,29 @@ jobs:
         run: cmake --build windows/build --config Release --parallel
       - name: Core and isolated Win32 smoke tests
         run: ctest --test-dir windows/build -C Release --output-on-failure
+      - name: Verify binary security protections
+        run: python scripts/verify-windows-binary.py windows/build/Release/LightSnap.exe --output windows/build/security-report.json
+      - name: Record signature and Defender scan availability
+        shell: pwsh
+        run: ./scripts/check-windows-security.ps1 -Executable windows/build/Release/LightSnap.exe -OutputDirectory windows/build
       - name: Package portable application
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force dist/windows-x64 | Out-Null
           Copy-Item windows/build/Release/LightSnap.exe dist/windows-x64/
           Copy-Item windows/README.md dist/windows-x64/README.md
-          Compress-Archive -Path dist/windows-x64/* -DestinationPath dist/LightSnap-0.1.0-Windows-x64.zip
-          (Get-FileHash dist/LightSnap-0.1.0-Windows-x64.zip -Algorithm SHA256).Hash | Out-File dist/SHA256.txt -Encoding ascii
+          Copy-Item windows/build/security-report.json dist/windows-x64/
+          Copy-Item windows/build/antivirus-report.json dist/windows-x64/
+          $exeHash = (Get-FileHash dist/windows-x64/LightSnap.exe -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$exeHash  LightSnap.exe" | Out-File dist/windows-x64/LightSnap.exe.sha256 -Encoding ascii
+          Compress-Archive -Path dist/windows-x64/* -DestinationPath dist/LightSnap-0.1.1-Windows-x64.zip
+          (Get-FileHash dist/LightSnap-0.1.1-Windows-x64.zip -Algorithm SHA256).Hash | Out-File dist/SHA256.txt -Encoding ascii
       - name: Upload Windows package
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: LightSnap-0.1.0-Windows-x64
+          name: LightSnap-0.1.1-Windows-x64
           path: |
-            dist/LightSnap-0.1.0-Windows-x64.zip
+            dist/LightSnap-0.1.1-Windows-x64.zip
             dist/SHA256.txt
           if-no-files-found: error
           retention-days: 14

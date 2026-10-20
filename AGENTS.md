@@ -12,7 +12,7 @@
 
 ## Windows 작업
 
-- Windows 0.1.0은 `windows/`의 C++17/Win32 구현이다. `windows/README.md`를 먼저 읽고 Windows 전용 변경을 Swift 타깃에 섞지 않는다.
+- Windows 0.1.1은 `windows/`의 C++17/Win32 구현이다. `windows/README.md`를 먼저 읽고 Windows 전용 변경을 Swift 타깃에 섞지 않는다.
 - 공통 액션 ID는 macOS와 같지만 키 코드·설정 파일·배포 버전은 별도다. Windows 파일 schema 1, 누락=해제와 미래/손상 파일 보존을 유지한다.
 - Win32 대상 창 호출은 단일 작업자, UI/전역 키/화면 캡처는 메인 스레드다. 결과 읽기 검증·최초 복원·bounded history와 진단을 유지한다.
 - `cmake -S windows -B windows/build -A x64` → Release 빌드 → CTest를 Windows에서 수행한다. Mac에서는 C++ core 검사와 크로스 컴파일을 구분한다.

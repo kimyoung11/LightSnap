@@ -1,15 +1,24 @@
-# LightSnap Windows 0.1.0
+# LightSnap Windows 0.1.1
 
 macOS판의 배치 정책을 옮긴 **Windows 10 1607 이상 / Windows 11 x64용 첫 버전**입니다. Windows 전용 C++17/Win32 앱이며 Electron·.NET·Swift 런타임 설치가 필요 없습니다. 기존 macOS 앱은 별도로 유지합니다. Windows ARM64 네이티브 빌드는 제공하지 않습니다.
 
 ## 실행
 
-1. **[Windows ZIP 다운로드](https://github.com/kimyoung11/LightSnap/releases/download/windows-v0.1.0/LightSnap-0.1.0-Windows-x64.zip)** 후 계속 사용할 폴더에 **모두 압축 해제**합니다.
+1. **[Windows ZIP 다운로드](https://github.com/kimyoung11/LightSnap/releases/download/windows-v0.1.1/LightSnap-0.1.1-Windows-x64.zip)** 후 계속 사용할 폴더에 **모두 압축 해제**합니다.
 2. `LightSnap.exe`를 실행합니다. 처음에는 설정 창이 열립니다.
 3. 메모장이나 브라우저의 일반 창을 선택하고 `Ctrl+Alt+←`를 누릅니다.
 4. 설정 창을 닫으면 알림 영역(트레이)에 남습니다. 숨겨진 아이콘의 LightSnap을 열어 설정·진단·종료를 사용할 수 있습니다.
 
 접근성 권한 등록은 필요 없습니다. 관리자 권한으로 실행한 앱, 크기 조절이 불가능한 창, 게임·전체 화면·가상 데스크톱의 숨겨진 창은 제어가 제한될 수 있습니다. 자동 권한 상승은 하지 않습니다. 이 첫 배포본은 Authenticode 서명이 없는 테스트용 빌드이며 신뢰도 경고가 표시될 수 있습니다. 정식 서명이나 SmartScreen 평판을 확보한 배포본으로 설명하지 않습니다.
+
+## V3 실행 알림과 보안 상태
+
+‘한 번만 실행’ 등의 선택지가 있는 프로그램 실행 알림은 신뢰 정보가 부족한 파일에 대한 평판 확인일 수 있습니다. 악성코드 진단명·치료/격리 알림과 구분해야 하며, 버튼 이름만으로 오탐이나 안전을 단정할 수 없습니다. 0.1.1은 메모리 보호와 빌드 검증을 보강한 버전이며 **V3 경고 해제 또는 안랩 인증을 받은 버전이 아닙니다.**
+
+- CFG·스택 보호·ASLR·DEP를 MSVC에 명시하고, CI가 실제 PE 보호 정보를 검사합니다.
+- ZIP에는 `security-report.json`, `antivirus-report.json`, `LightSnap.exe.sha256`도 포함합니다. Defender 검사 가능 여부와 결과, 서명 상태를 기록하며 V3는 별도 미검증으로 표시합니다.
+- 현재 코드 서명용 신뢰 인증서가 제공되지 않아 **미서명**입니다. 서명은 배포자 확인·변조 방지에 필요하지만 백신/평판 경고의 제거를 보장하지 않습니다.
+- [보안 보강 내용과 정식 서명·안랩 문의 절차](../docs/WINDOWS_SECURITY.md)를 확인하세요. EXE를 실행하기 전에 읽을 수 있습니다. V3 설정이나 예외 목록을 앱이 변경하지 않습니다.
 
 ## 기본 단축키
 
@@ -52,7 +61,7 @@ ctest --test-dir windows/build -C Release --output-on-failure
 .\windows\build\Release\LightSnap.exe
 ```
 
-Release는 MSVC 런타임을 정적으로 링크합니다. 사용자 배포본은 **[GitHub Releases](https://github.com/kimyoung11/LightSnap/releases/tag/windows-v0.1.0)**에서 ZIP과 SHA-256으로 제공합니다. Release 첨부 파일에는 Actions 아티팩트의 14일 보관 기간이 적용되지 않습니다. EXE 실행에는 로그인이 필요 없습니다. CI 빌드도 Actions에서 별도로 확인할 수 있습니다.
+Release는 MSVC 런타임을 정적으로 링크합니다. 사용자 배포본은 **[GitHub Releases](https://github.com/kimyoung11/LightSnap/releases/tag/windows-v0.1.1)**에서 ZIP과 SHA-256으로 제공합니다. Release 첨부 파일에는 Actions 아티팩트의 14일 보관 기간이 적용되지 않습니다. EXE 실행에는 로그인이 필요 없습니다. CI 빌드도 Actions에서 별도로 확인할 수 있습니다.
 
 Mac/Linux에서는 별도 설치한 [Zig](https://ziglang.org/download/) 0.17.0으로 `ZIG=/absolute/path/to/zig ./scripts/build-windows.sh` 크로스 컴파일도 가능합니다. 스크립트가 도구를 자동 다운로드하지 않으며 Windows 실행 검증을 대신하지 않습니다.
 

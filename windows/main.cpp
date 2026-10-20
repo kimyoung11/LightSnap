@@ -159,7 +159,7 @@ void requestSnap(int action){if(paused||editing||action<0||action>=22)return;++r
 }
 void diagnostics(){PROCESS_MEMORY_COUNTERS_EX m{};m.cb=sizeof(m);GetProcessMemoryInfo(GetCurrentProcess(),reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&m),sizeof(m));
     auto sorted=std::vector<double>(latencies.begin(),latencies.end());std::sort(sorted.begin(),sorted.end());
-    std::wstring text=L"LightSnap Windows 0.1.0 (x64)\n";
+    std::wstring text=L"LightSnap Windows 0.1.1 (x64)\n";
     text+=L"작업 집합: "+std::to_wstring(m.WorkingSetSize/1024/1024)+L" MiB\n전용 메모리: "+std::to_wstring(m.PrivateUsage/1024/1024)+L" MiB\n";
     text+=L"단축키 수신: "+std::to_wstring(received)+L" · 완료: "+std::to_wstring(successful)+L" · 실패: "+std::to_wstring(failed)+L"\n";
     if(!sorted.empty())text+=L"최근 성공 "+std::to_wstring(sorted.size())+L"건 p95: "+std::to_wstring(static_cast<int>(std::ceil(sorted[static_cast<size_t>(std::ceil(sorted.size()*.95))-1])))+L" ms\n";
@@ -185,7 +185,7 @@ LRESULT CALLBACK wndproc(HWND w,UINT msg,WPARAM wp,LPARAM lp){
     if(msg==taskbarCreated&&taskbarCreated){addTray();return 0;}
     switch(msg){
     case WM_CREATE:{ui=w;
-        control(L"STATIC",L"LightSnap Windows · 0.1.0",0,201);control(L"STATIC",L"Ctrl+Alt+방향키로 창 배치 · 설정을 닫아도 트레이에서 실행됩니다.",0,202);
+        control(L"STATIC",L"LightSnap Windows · 0.1.1",0,201);control(L"STATIC",L"Ctrl+Alt+방향키로 창 배치 · 설정을 닫아도 트레이에서 실행됩니다.",0,202);
         combo=control(WC_COMBOBOXW,L"",CBS_DROPDOWNLIST|WS_TABSTOP|WS_VSCROLL,ID_ACTION);for(auto name:names)SendMessageW(combo,CB_ADDSTRING,0,reinterpret_cast<LPARAM>(name));SendMessageW(combo,CB_SETCURSEL,0,0);
         keyControl=control(HOTKEY_CLASSW,L"",WS_BORDER|WS_TABSTOP,ID_KEY);SetWindowSubclass(keyControl,hotkeyProc,1,0);
         bindingControl=control(L"STATIC",L"",0,203);control(L"BUTTON",L"단축키 저장",WS_TABSTOP,ID_SAVE);control(L"BUTTON",L"이 동작 해제",WS_TABSTOP,ID_DISABLE);control(L"BUTTON",L"전체 단축키 기본값",WS_TABSTOP,ID_DEFAULT);

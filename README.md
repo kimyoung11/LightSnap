@@ -23,11 +23,13 @@
 | 플랫폼 | 현재 버전 | 구현 / 시작하기 |
 | --- | --- | --- |
 | macOS 13+ | 0.2.0 | Swift · AppKit · 기존 [빌드와 실행](#빌드와-실행) |
-| Windows 10 1607+ / 11 x64 | 0.1.0 첫 버전 | C++ · Win32 · **[Windows 실행·단축키·빌드 안내](windows/README.md)** |
+| Windows 10 1607+ / 11 x64 | 0.1.1 첫 버전 | C++ · Win32 · **[Windows 실행·단축키·빌드 안내](windows/README.md)** |
 
 Windows판은 절반·4/6분할·⅓·⅔·최대화·최초 배치 복원·다음 모니터·좌우 크기 순환·단축키 편집·로그인 실행·트레이와 진단을 구현합니다. 기본 단축키는 **Ctrl+Alt**, 다음 모니터는 **Ctrl+Alt+Shift+→**입니다. Electron·.NET 설치와 계정 연결이 필요 없습니다.
 
-Windows 배포 ZIP은 **[GitHub Releases에서 다운로드](https://github.com/kimyoung11/LightSnap/releases/download/windows-v0.1.0/LightSnap-0.1.0-Windows-x64.zip)**합니다. [릴리스 안내](https://github.com/kimyoung11/LightSnap/releases/tag/windows-v0.1.0)에서 체크섬과 변경 내용을 확인할 수 있습니다. 압축을 풀고 `LightSnap.exe`를 실행하세요. 첫 버전은 서명되지 않은 테스트 빌드입니다. 자동 검사와 실제 Windows 데스크톱 수동 검증 범위는 [검증 기록](VALIDATION.md)에 구분합니다. 아래 macOS 권한·키 설명은 Mac 전용입니다.
+Windows 배포 ZIP은 **[GitHub Releases에서 다운로드](https://github.com/kimyoung11/LightSnap/releases/download/windows-v0.1.1/LightSnap-0.1.1-Windows-x64.zip)**합니다. [릴리스 안내](https://github.com/kimyoung11/LightSnap/releases/tag/windows-v0.1.1)에서 체크섬과 변경 내용을 확인할 수 있습니다. 압축을 풀고 `LightSnap.exe`를 실행하세요. 첫 버전은 서명되지 않은 테스트 빌드입니다. 자동 검사와 실제 Windows 데스크톱 수동 검증 범위는 [검증 기록](VALIDATION.md)에 구분합니다. 아래 macOS 권한·키 설명은 Mac 전용입니다.
+
+Windows 0.1.1은 CFG 등 메모리 보호와 배포 검증을 강화했습니다. **미서명이며 V3 실행 알림 해제는 확인되지 않았습니다.** [V3 알림·서명·검사 범위](docs/WINDOWS_SECURITY.md)를 확인하세요.
 
 ## 먼저, 직접 정리해 보세요
 
