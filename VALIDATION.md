@@ -7,6 +7,7 @@
 - [Native CI / 8a3cdbd](https://github.com/kimyoung11/LightSnap/actions/runs/39429461873) 통과: Windows MSVC x64 Release, core 127개 검사와 Win32 smoke test 2/2 통과. macOS job의 회귀 검사·웹 검사·앱 빌드·서명 검증도 통과했습니다.
 - CI ZIP SHA-256 일치, x64 GUI PE 및 EXE/README만 포함한 패키지 확인. C++ 런타임 DLL 의존이 없고 Windows 시스템 DLL만 가져오는 것을 확인했습니다. 제한된 패턴 검사에서 자격증명·Mac 개인 경로는 발견되지 않았습니다(비밀정보 부재의 보증은 아님).
 - 로컬 macOS 회귀 427개·앱 빌드·plist/ad-hoc 서명 검사도 재실행하여 통과했습니다.
+- 단축키 충돌 시 등록 실패 안내를 보완한 [8dd9013 Windows job](https://github.com/kimyoung11/LightSnap/actions/runs/39429839926)도 MSVC 빌드·CTest·패키징을 통과했습니다. 전달 ZIP은 이 코드의 CI 산출물입니다.
 - Windows CI는 core 검사와 숨겨진 자기 창/임시 설정 파일의 `--self-test`를 실행합니다. 외부 앱·사용자 레지스트리·전역 키를 변경하지 않습니다.
 - **미확인:** 실제 Windows 데스크톱에서 전역 키·다른 앱 이동/복원·100/125/150/200% 혼합 DPI·모니터 연결 해제·트레이/UI·로그인 실행·장시간 리소스. 자동 검사 통과는 이 수동 확인을 대신하지 않습니다.
 - Windows 메모리는 작업 집합·전용 메모리(MiB)이며 macOS footprint(MB)와 직접 같은 지표가 아닙니다. Windows 정식 서명·SmartScreen 평판·ARM64 빌드는 미제공입니다.
